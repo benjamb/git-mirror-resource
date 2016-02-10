@@ -1,0 +1,33 @@
+#!/bin/sh
+
+set -e
+
+. "$(dirname $0)"/common.sh
+
+if [ "$#" -lt 1 ]; then
+  >&2 echo "usage: $0 <path/to/destination>"
+  exit 1
+fi
+
+destination="$1"
+
+payload="$(mktemp)"
+
+cat > "$payload" <&0
+
+load_pubkey "$payload"
+configure_git_ssl_verification "$payload"
+
+uri="$(jq -r '.source.uri // ""' < $payload)"
+version_date="$(jq -r '.version.updated // ""' < "$payload")"
+# TODO: submodules?
+
+if [ -z "$uri" ]; then
+  >&2 echo "invalid payload (missing uri):"
+  >&2 cat "$payload"
+  exit 1
+fi
+
+>&2 git clone --mirror "$uri" "$destination"
+
+echo "{\"version\": {\"updated\": \"$version_date\"}}"
