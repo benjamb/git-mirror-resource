@@ -27,7 +27,7 @@ days_since="$((seconds_since / (24*60*60)))"
 if [ "$frequency" = "daily" -a "$days_since" -ne 0 ] || \
        [ "$frequency" = "weekly" -a "$days_since" -ge 7 ] || \
        [ "$frequency" = "monthly" -a "$days_since" -ge 28 ]; then
-    echo "{\"version\": {\"updated\": \"$(date -d @"$now" +%F)\"}}"
+    echo "[{\"updated\": \"$(date -d @"$now" +%F)\"}]"
     exit
 fi
 
