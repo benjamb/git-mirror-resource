@@ -13,7 +13,7 @@ configure_git_ssl_verification "$payload"
 
 uri="$(jq -r '.source.uri // ""' < "$payload")"
 frequency="$(jq -r '.source.frequency // "daily"' < "$payload")"
-last_date="$(jq -r '.version.updated // ""' < "$payload" | awk '{print $1}')"
+last_date="$(jq -r '.version.updated // "$(date +%F)"' < "$payload")"
 
 >&2 git ls-remote --exit-code "$uri"
 
@@ -21,14 +21,14 @@ last_date="$(jq -r '.version.updated // ""' < "$payload" | awk '{print $1}')"
 frequency="$(echo "$frequency" | tr '[:upper:]' '[:lower:]')"
 
 now="$(date +%s)"
-[ -z "$last_date" ] && last_date="$now"
+last_date="$(date -d "$last_date" +%s)"
 seconds_since="$((now - last_date))"
 days_since="$((seconds_since / (24*60*60)))"
 if [ "$frequency" = "daily" -a "$days_since" -ne 0 ] || \
        [ "$frequency" = "weekly" -a "$days_since" -ge 7 ] || \
        [ "$frequency" = "monthly" -a "$days_since" -ge 28 ]; then
-    echo "{\"version\": {\"updated\": \"$now ($(date -d @"$now" +%F))\"}}"
+    echo "{\"version\": {\"updated\": \"$(date -d @"$now" +%F)\"}}"
     exit
 fi
 
-echo "[{\"updated\": \"$last_date ($(date -d @"$last_date" +%F))\"}]"
+echo "[{\"updated\": \"$(date -d @"$last_date" +%F)\"}]"

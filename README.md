@@ -9,7 +9,7 @@ returns a new version at a time based on the specified frequency.
 
 This will not track changes to a branch/tag (nor any ref within a repo), instead
 this will pass a new "version" onto Concourse.ci in the format
-"{'updated': 'seconds_since_epoch (YY-MM-DD)'}".
+"{'updated': 'YY-MM-DD'}".
 
 ## Config
 
