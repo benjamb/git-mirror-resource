@@ -20,6 +20,9 @@ last_date="$(jq -r '.version.updated // "$(date +%F)"' < "$payload")"
 # convert to lower case
 frequency="$(echo "$frequency" | tr '[:upper:]' '[:lower:]')"
 
+# handle "seconds_since_epoch (YYYY-MM-DD)" format
+last_date="$(echo "$last_date" | sed -E 's/.*([0-9-]{10})./\1/')"
+
 now="$(date +%s)"
 last_date="$(date -d "$last_date" +%s)"
 seconds_since="$((now - last_date))"
