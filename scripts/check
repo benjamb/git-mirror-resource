@@ -13,7 +13,7 @@ configure_git_ssl_verification "$payload"
 
 uri="$(jq -r '.source.uri // ""' < "$payload")"
 frequency="$(jq -r '.source.frequency // "daily"' < "$payload")"
-last_date="$(jq -r '.version.updated // "$(date +%F)"' < "$payload")"
+last_date="$(jq -r ".version.updated // \"$(date +%F)\"" < "$payload")"
 
 >&2 git ls-remote --exit-code "$uri"
 
