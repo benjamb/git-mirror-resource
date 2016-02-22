@@ -13,9 +13,7 @@ configure_git_ssl_verification "$payload"
 
 uri="$(jq -r '.source.uri // ""' < "$payload")"
 frequency="$(jq -r '.source.frequency // "daily"' < "$payload")"
-last_date="$(jq -r ".version.updated // \"$(date +%F)\"" < "$payload")"
-
->&2 git ls-remote --exit-code "$uri"
+last_date="$(jq -r ".version.updated // \"$(date -d@0 +%F)\"" < "$payload")"
 
 # convert to lower case
 frequency="$(echo "$frequency" | tr '[:upper:]' '[:lower:]')"
@@ -30,6 +28,7 @@ days_since="$((seconds_since / (24*60*60)))"
 if [ "$frequency" = "daily" -a "$days_since" -ne 0 ] || \
        [ "$frequency" = "weekly" -a "$days_since" -ge 7 ] || \
        [ "$frequency" = "monthly" -a "$days_since" -ge 28 ]; then
+    >&2 git ls-remote --exit-code "$uri"
     echo "[{\"updated\": \"$(date -d @"$now" +%F)\"}]"
     exit
 fi
